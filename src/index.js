@@ -45,7 +45,7 @@ function apply (options = {}, compiler) {
 				comb.processFile(path).then((err) => {
 					if (err) {
 						console.log(`${chalk.redBright('[error]')} ${path}`);
-						reject();
+						reject(new Error(err));
 					}
 					else {
 						console.log(`${chalk.greenBright('[done]')} ${path}`);
