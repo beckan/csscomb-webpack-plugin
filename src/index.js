@@ -11,7 +11,7 @@ function apply (options = {}, compiler) {
 	const context = options.context || compiler.context;
 
 	options = assign({
-		config: './.csscomb'
+		configFile: './.csscomb'
 	}, options, {
 		files: arrify(options.files || '**/*.s?(c|a)ss').map(function (file) {
 			return path.join(context, '/', file);
@@ -20,12 +20,12 @@ function apply (options = {}, compiler) {
 
 	console.log(chalk.underline.whiteBright('CSSComb is processing files:\n'));
 
-	const configPath = path.resolve(options.config);
+	const configPath = path.resolve(options.configFile);
 	let config = null;
 
 	if (fs.existsSync(configPath)) {
 		console.log(`Using custom config file "${configPath}"...\n`);
-		config = JSON.parse(fs.readFileSync(path.resolve(options.config), 'utf8'));
+		config = JSON.parse(fs.readFileSync(path.resolve(options.configFile), 'utf8'));
 	}
 	else {
 		console.log('Using default config file...\n');
