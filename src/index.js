@@ -14,26 +14,22 @@ CSSCombWebpackPlugin.prototype.apply = function (compiler) {
 
 	compiler.hooks.run.tapAsync('CSSCombWebpackPlugin', (compiler, callback) => {
 
-		options = this.options;
-		const context = options.context || compiler.context;
+		const context = this.options.context || compiler.context;
 
-		options = assign({
+		this.options = assign({
 			configFile: './.csscomb',
-			displayErrors: true
-		}, options, {
-			files: arrify(options.files || '**/*.s?(c|a)ss').map(function (file) {
-				return path.join(context, '/', file);
-			}),
-		});
+			displayErrors: true,
+			files: '**/*.s?(c|a)ss'
+		}, this.options);
 
 		console.log(chalk.underline.whiteBright('CSSComb is processing files:\n'));
 
-		const configPath = path.resolve(options.configFile);
+		const configPath = path.resolve(this.options.configFile);
 		let config = null;
 
 		if (fs.existsSync(configPath)) {
 			console.log(`Using custom config file "${configPath}"...\n`);
-			config = JSON.parse(fs.readFileSync(path.resolve(options.configFile), 'utf8'));
+			config = JSON.parse(fs.readFileSync(path.resolve(this.options.configFile), 'utf8'));
 		}
 		else {
 			console.log('Using default config file...\n');
@@ -42,7 +38,7 @@ CSSCombWebpackPlugin.prototype.apply = function (compiler) {
 
 		const comb = new Comb();
 
-		globby(options.files).then(paths => {
+		globby(this.options.files).then(paths => {
 
 			comb.configure(config);
 
@@ -57,7 +53,7 @@ CSSCombWebpackPlugin.prototype.apply = function (compiler) {
 						resolve();
 					}, (reason) => {
 						console.log(`${chalk.redBright('[failed]')} ${path}`);
-						if (options.displayErrors) {
+						if (this.options.displayErrors) {
 							let error = reason.stack || '';
 							console.log(`${chalk.underline.whiteBright('Message')}: "${error}"\n`);
 						}

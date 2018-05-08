@@ -47,7 +47,14 @@ _Note: If no config was found, it will load CSSComb standard config_
 Type: `String|Array[String]`
 Default: `'**/*.s?(a|c)ss'`
 
-Specify the glob pattern for finding files. Must be relative to `options.context`.
+Specify the glob pattern for finding files.
+
+### `displayErrors`
+
+Type: `Boolean`
+Default: `true`
+
+Show CSSComb error messages.
 
 ## License
 
