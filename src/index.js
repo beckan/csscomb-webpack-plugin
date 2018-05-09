@@ -74,7 +74,9 @@ CSSCombWebpackPlugin.prototype.run = function (compiler, callback) {
 					}, (reason) => {
 						if (this.options.displayErrors) {
 							let error = reason.stack || '';
+							logs.push(`${chalk.redBright('[failed]')} ${path}`);
 							logs.push(`${chalk.underline.whiteBright('Message')}: "${error}"\n`);
+							touched = true;
 						}
 						resolve();
 					});
