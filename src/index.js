@@ -13,62 +13,87 @@ function CSSCombWebpackPlugin (options) {
 CSSCombWebpackPlugin.prototype.apply = function (compiler) {
 
 	compiler.hooks.run.tapAsync('CSSCombWebpackPlugin', (compiler, callback) => {
+		this.run(compiler, callback);
+	});
 
-		const context = this.options.context || compiler.context;
+	compiler.hooks.watchRun.tapAsync('CSSCombWebpackPlugin', (compiler, callback) => {
+		this.run(compiler, callback);
+	});
+}
 
-		this.options = assign({
-			configFile: './.csscomb',
-			displayErrors: true,
-			files: '**/*.s?(c|a)ss'
-		}, this.options);
+CSSCombWebpackPlugin.prototype.run = function (compiler, callback) {
 
-		console.log(chalk.underline.whiteBright('CSSComb is processing files:\n'));
+	const context = this.options.context || compiler.context;
 
-		const configPath = path.resolve(this.options.configFile);
-		let config = null;
+	this.options = assign({
+		configFile: './.csscomb',
+		displayErrors: true,
+		files: '**/*.s?(c|a)ss'
+	}, this.options);
 
-		if (fs.existsSync(configPath)) {
-			console.log(`Using custom config file "${configPath}"...\n`);
-			config = JSON.parse(fs.readFileSync(path.resolve(this.options.configFile), 'utf8'));
-		}
-		else {
-			console.log('Using default config file...\n');
-			config = Comb.getConfig('csscomb');
-		}
+	let logs = [];
+	let touched = false;
 
-		const comb = new Comb();
+	logs.push(chalk.underline.whiteBright('CSSComb is processing files:\n'));
 
-		globby(this.options.files).then(paths => {
+	const configPath = path.resolve(this.options.configFile);
+	let config = null;
 
-			comb.configure(config);
+	if (fs.existsSync(configPath)) {
+		logs.push(`Using custom config file "${configPath}"...\n`);
+		config = JSON.parse(fs.readFileSync(path.resolve(this.options.configFile), 'utf8'));
+	}
+	else {
+		logs.push('Using default config file...\n');
+		config = Comb.getConfig('csscomb');
+	}
 
-			let promises = [];
+	const comb = new Comb();
 
-			paths.forEach((path) => {
-				let thisPromies = new Promise((resolve, reject) => {
-					let css = fs.readFileSync(path).toString();
+	globby(this.options.files).then(paths => {
 
-					comb.processString(css).then((data) => {
-						console.log(`${chalk.greenBright('[success]')} ${path}`);
-						resolve();
+		comb.configure(config);
+
+		let promises = [];
+
+		paths.forEach((path) => {
+			let thisPromies = new Promise((resolve, reject) => {
+				fs.readFile(path, (err, data) => {
+					let css = data.toString();
+					comb.processString(css).then((processedData) => {
+						if (css === processedData) {
+							resolve();
+							return;
+						}
+
+						fs.writeFile(path, processedData, () => {
+							logs.push(`${chalk.greenBright('[success]')} ${path}`);
+							touched = true;
+							resolve();
+						});
 					}, (reason) => {
-						console.log(`${chalk.redBright('[failed]')} ${path}`);
 						if (this.options.displayErrors) {
 							let error = reason.stack || '';
-							console.log(`${chalk.underline.whiteBright('Message')}: "${error}"\n`);
+							logs.push(`${chalk.underline.whiteBright('Message')}: "${error}"\n`);
 						}
 						resolve();
 					});
 				});
-
-				promises.push(thisPromies);
 			});
 
-			Promise.all(promises).then(() => {
-				console.log(chalk.underline.whiteBright('\nCSSComb is done processing files.\n'));
-				callback();
-			});
+			promises.push(thisPromies);
+		});
 
+		Promise.all(promises).then(() => {
+			logs.push(chalk.underline.whiteBright('\nCSSComb is done processing files.\n'));
+
+			if (touched === true) {
+				logs.forEach((message) => {
+					console.log(message);
+				});
+			}
+
+			callback();
 		});
 
 	});
