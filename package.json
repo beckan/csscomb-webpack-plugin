@@ -1,9 +1,12 @@
 {
   "name": "csscomb-webpack-plugin",
-  "version": "0.3.0",
-  "description": "",
-  "main": "src/index.js",
-  "scripts": {},
+  "version": "0.3.1",
+  "description": "A CSSComb plugin for webpack",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "babel src -d lib --presets=env --plugins=add-module-exports",
+    "prepublish": "npm run build"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/beckan/csscomb-webpack-plugin.git"
@@ -23,6 +26,12 @@
     "chalk": "^2.4.1",
     "csscomb": "^4.2.0",
     "globby": "^8.0.1",
+    "gonzales-pe": "^4.2.3",
     "object-assign": "^4.1.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-env": "^1.7.0"
   }
 }
