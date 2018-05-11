@@ -12,13 +12,26 @@ function CSSCombWebpackPlugin (options) {
 
 CSSCombWebpackPlugin.prototype.apply = function (compiler) {
 
-	compiler.hooks.run.tapAsync('CSSCombWebpackPlugin', (compiler, callback) => {
-		this.run(compiler, callback);
-	});
+	// If Webpack 4, then use new plugin hooks
+	if (compiler.hooks) {
+		compiler.hooks.run.tapAsync('CSSCombWebpackPlugin', (compiler, callback) => {
+			this.run(compiler, callback);
+		});
 
-	compiler.hooks.watchRun.tapAsync('CSSCombWebpackPlugin', (compiler, callback) => {
-		this.run(compiler, callback);
-	});
+		compiler.hooks.watchRun.tapAsync('CSSCombWebpackPlugin', (compiler, callback) => {
+			this.run(compiler, callback);
+		});
+	}
+	// Otherwise use the old way of init plugin
+	else {
+		compiler.plugin('run', (compiler, callback) => {
+			this.run(compiler, callback);
+		})
+
+		compiler.plugin('watch-run', (compiler, callback) => {
+			this.run(compiler, callback);
+		})
+	}
 }
 
 CSSCombWebpackPlugin.prototype.run = function (compiler, callback) {
@@ -33,8 +46,7 @@ CSSCombWebpackPlugin.prototype.run = function (compiler, callback) {
 
 	let logs = [];
 	let touched = false;
-
-	logs.push(chalk.underline.whiteBright('CSSComb is processing files:\n'));
+	logs.push(chalk.bgBlackBright.black('   CSSComb is processing files:   \n'));
 
 	const configPath = path.resolve(this.options.configFile);
 	let config = null;
@@ -87,7 +99,7 @@ CSSCombWebpackPlugin.prototype.run = function (compiler, callback) {
 		});
 
 		Promise.all(promises).then(() => {
-			logs.push(chalk.underline.whiteBright('\nCSSComb is done processing files.\n'));
+			logs.push(chalk.bgBlackBright.black('\n   CSSComb is done processing files.   \n'));
 
 			if (touched === true) {
 				logs.forEach((message) => {
