@@ -1,7 +1,7 @@
 {
   "name": "csscomb-webpack-plugin",
-  "version": "0.3.0",
-  "description": "",
+  "version": "0.3.1",
+  "description": "A CSSComb plugin for webpack",
   "main": "lib/index.js",
   "scripts": {
     "build": "babel src -d lib --presets=env --plugins=add-module-exports",
