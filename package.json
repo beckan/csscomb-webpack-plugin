@@ -13,6 +13,7 @@
   },
   "keywords": [
     "webpack",
+    "webpack-plugin",
     "csscomb"
   ],
   "author": "Daniel Bäckström",
