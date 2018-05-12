@@ -1,11 +1,11 @@
 {
   "name": "csscomb-webpack-plugin",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "A CSSComb plugin for webpack",
   "main": "lib/index.js",
   "scripts": {
     "build": "babel src -d lib --presets=env --plugins=add-module-exports",
-    "prepublish": "npm run build"
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -13,6 +13,7 @@
   },
   "keywords": [
     "webpack",
+    "webpack-plugin",
     "csscomb"
   ],
   "author": "Daniel Bäckström",
@@ -22,12 +23,10 @@
   },
   "homepage": "https://github.com/beckan/csscomb-webpack-plugin#readme",
   "dependencies": {
-    "arrify": "^1.0.1",
     "chalk": "^2.4.1",
     "csscomb": "^4.2.0",
     "globby": "^8.0.1",
-    "gonzales-pe": "^4.2.3",
-    "object-assign": "^4.1.1"
+    "gonzales-pe": "^4.2.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
