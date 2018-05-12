@@ -4,7 +4,7 @@ A CSSComb plugin for webpack
 
 ## Requirements
 
-This module requires a minimum of Node v6.9.0 and webpack v3.0.0.
+This module requires a minimum of Node v6.9.0 and it's compatible with both Webpack 3 and 4.
 
 ## Getting Started
 
