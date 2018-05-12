@@ -1,23 +1,39 @@
+/**
+ * csscomb-webpack-plugin
+ * ---
+ * A Webpack plugin to let CSSComb process CSS source files.
+ */
+
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
 import arrify from 'arrify';
 import assign from 'object-assign';
 import globby from 'globby';
-import Comb from 'csscomb';
+import CSSComb from 'csscomb';
 
 class CSSCombWebpackPlugin {
-	constructor (options) {
+	/**
+	 * Constructor, get options
+	 * @param  {[Object]} options [User options]
+	 */
+	constructor (options = {}) {
+		this.pluginName = 'CSSCombWebpackPlugin';
 		this.options = options;
 	}
+
+	/**
+	 * Init webpack plugin hooks
+	 * @param  {[Object]} compiler [Webpack compiler]
+	 */
 	apply (compiler) {
 		// If Webpack 4, then use new plugin hooks
 		if (compiler.hooks) {
-			compiler.hooks.run.tapAsync('CSSCombWebpackPlugin', (compiler, callback) => {
+			compiler.hooks.run.tapAsync(this.pluginName, (compiler, callback) => {
 				this.run(compiler, callback);
 			});
 
-			compiler.hooks.watchRun.tapAsync('CSSCombWebpackPlugin', (compiler, callback) => {
+			compiler.hooks.watchRun.tapAsync(this.pluginName, (compiler, callback) => {
 				this.run(compiler, callback);
 			});
 		}
@@ -32,9 +48,16 @@ class CSSCombWebpackPlugin {
 			})
 		}
 	}
+
+	/**
+	 * Process files
+	 * @param  {[Object]} compiler [Webpack compiler]
+	 * @param  {Function} callback [Webpack callback function]
+	 */
 	run (compiler, callback) {
 		const context = this.options.context || compiler.context;
 
+		// Merge options
 		this.options = assign({
 			configFile: './.csscomb',
 			displayErrors: true,
@@ -43,44 +66,65 @@ class CSSCombWebpackPlugin {
 
 		let logs = [];
 		let touched = false;
+
+		// Start message
 		logs.push(chalk.bgBlackBright.black('   CSSComb is processing files:   \n'));
 
+		// Get CSSComb config path
 		const configPath = path.resolve(this.options.configFile);
 		let config = null;
 
+		// If a custom config exists, then get it
 		if (fs.existsSync(configPath)) {
 			logs.push(`Using custom config file "${configPath}"...\n`);
 			config = JSON.parse(fs.readFileSync(path.resolve(this.options.configFile), 'utf8'));
 		}
+		// Otherwise get csscomb stadard config
 		else {
 			logs.push('Using default config file...\n');
-			config = Comb.getConfig('csscomb');
+			config = CSSComb.getConfig('csscomb');
 		}
 
-		const comb = new Comb();
+		// New instans of CSSComb
+		const csscomb = new CSSComb();
 
+		// Get all files to process
 		globby(this.options.files).then(paths => {
 
-			comb.configure(config);
+			// Configure CSSComb
+			csscomb.configure(config);
 
 			let promises = [];
 
+			// Walk trough files
 			paths.forEach((path) => {
 				let thisPromies = new Promise((resolve, reject) => {
+
+					// Read file
 					fs.readFile(path, (err, data) => {
+
+						// Get file content
 						let css = data.toString();
-						comb.processString(css).then((processedData) => {
+
+						// Let CSSComb process the content
+						csscomb.processString(css).then((processedData) => {
+							// If the file is already processed. Then resolve without write to the file
 							if (css === processedData) {
 								resolve();
 								return;
 							}
 
+							// Write changes to the file, then log success message and resolve
 							fs.writeFile(path, processedData, () => {
 								logs.push(`${chalk.greenBright('[success]')} ${path}`);
 								touched = true;
 								resolve();
 							});
+
+						// On CSSComb process error
 						}, (reason) => {
+
+							// If we want to display CSSComb errors, then log the error
 							if (this.options.displayErrors) {
 								let error = reason.stack || '';
 								logs.push(`${chalk.redBright('[failed]')} ${path}`);
@@ -92,18 +136,22 @@ class CSSCombWebpackPlugin {
 					});
 				});
 
+				// Push promise to the premise array
 				promises.push(thisPromies);
 			});
 
+			//When all files is processed
 			Promise.all(promises).then(() => {
 				logs.push(chalk.bgBlackBright.black('\n   CSSComb is done processing files.   \n'));
 
+				// Console log all messages if some file where touched
 				if (touched === true) {
 					logs.forEach((message) => {
 						console.log(message);
 					});
 				}
 
+				// Webpack callback..
 				callback();
 			});
 
