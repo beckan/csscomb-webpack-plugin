@@ -22,12 +22,10 @@
   },
   "homepage": "https://github.com/beckan/csscomb-webpack-plugin#readme",
   "dependencies": {
-    "arrify": "^1.0.1",
     "chalk": "^2.4.1",
     "csscomb": "^4.2.0",
     "globby": "^8.0.1",
-    "gonzales-pe": "^4.2.3",
-    "object-assign": "^4.1.1"
+    "gonzales-pe": "^4.2.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

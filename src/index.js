@@ -7,8 +7,6 @@
 import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
-import arrify from 'arrify';
-import assign from 'object-assign';
 import globby from 'globby';
 import CSSComb from 'csscomb';
 
@@ -58,7 +56,7 @@ class CSSCombWebpackPlugin {
 		const context = this.options.context || compiler.context;
 
 		// Merge options
-		this.options = assign({
+		this.options = Object.assign({
 			configFile: './.csscomb',
 			displayErrors: true,
 			files: '**/*.s?(c|a)ss'
