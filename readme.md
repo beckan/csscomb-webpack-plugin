@@ -1,4 +1,4 @@
-# stylelint-webpack-plugin
+# csscomb-webpack-plugin
 
 A CSSComb plugin for webpack
 
