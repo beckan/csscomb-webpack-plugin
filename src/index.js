@@ -92,7 +92,7 @@ class CSSCombWebpackPlugin {
 		let touched = false;
 
 		// Start message
-		this.logs.push(chalk.bgBlackBright.black('   CSSComb is processing files:   \n'));
+		this.logs.push(`\n${chalk.bgBlackBright.black('   CSSComb is processing files:   ')}\n`);
 
 		// Initilaize CSSComb
 		this.initCSSComb();
@@ -148,7 +148,7 @@ class CSSCombWebpackPlugin {
 
 			//When all files is processed
 			Promise.all(this.promises).then(() => {
-				this.logs.push(chalk.bgBlackBright.black('\n   CSSComb is done processing files.   \n'));
+				this.logs.push(`\n${chalk.bgBlackBright.black('   CSSComb is done processing files   ')}\n`);
 
 				// Console log all messages if some file where touched
 				if (touched === true) {
