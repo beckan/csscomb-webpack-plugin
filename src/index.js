@@ -131,12 +131,12 @@ class CSSCombWebpackPlugin {
 						}, reason => {
 
 							this.logs.push(`${chalk.redBright('[failed]')} ${path}`);
+							touched = true;
 
 							// If we want to display CSSComb errors, then log the error
 							if (this.options.displayErrors) {
 								let error = reason.stack || '';
 								this.logs.push(`${chalk.underline.whiteBright('Message')}: "${error}"\n`);
-								touched = true;
 							}
 							resolve();
 						});
