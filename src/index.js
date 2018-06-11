@@ -92,7 +92,7 @@ class CSSCombWebpackPlugin {
 		let touched = false;
 
 		// Start message
-		this.logs.push(`\n${chalk.bgBlackBright.black('   CSSComb is processing files:   ')}\n`);
+		this.logs.push(`\n${chalk.bgWhite.black('   CSSComb is processing files:   ')}\n`);
 
 		// Initilaize CSSComb
 		this.initCSSComb();
@@ -130,10 +130,11 @@ class CSSCombWebpackPlugin {
 						// On CSSComb process error
 						}, reason => {
 
+							this.logs.push(`${chalk.redBright('[failed]')} ${path}`);
+
 							// If we want to display CSSComb errors, then log the error
 							if (this.options.displayErrors) {
 								let error = reason.stack || '';
-								this.logs.push(`${chalk.redBright('[failed]')} ${path}`);
 								this.logs.push(`${chalk.underline.whiteBright('Message')}: "${error}"\n`);
 								touched = true;
 							}
@@ -148,7 +149,7 @@ class CSSCombWebpackPlugin {
 
 			//When all files is processed
 			Promise.all(this.promises).then(() => {
-				this.logs.push(`\n${chalk.bgBlackBright.black('   CSSComb is done processing files   ')}\n`);
+				this.logs.push(`\n${chalk.bgWhite.black('   CSSComb is done processing files   ')}\n`);
 
 				// Console log all messages if some file where touched
 				if (touched === true) {
